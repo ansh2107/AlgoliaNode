@@ -1,0 +1,35 @@
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <h1>Algolia example with Angular.js</h1>
+      <div class="form">
+        <input autocomplete="on" autocorrect="on" class="form-control" ng-keyup="search()" ng-model="query" placeholder="Search people by name, company, location or keywords" spellcheck="false" type="text">
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="hit" ng-repeat="hit in hits">
+    <div class="row">
+      <div class="col-lg-1 col-sm-2">
+        <img ng-src="{{ hit.picture_url ||  "http://static-api.guidebox.com/060515/thumbnails_movies_small/127099-2878172361-4451218816-46997997-small-120x171.jpg" }}" />
+      </div>
+      <div class="col-sm-4">
+        <div ng-bind-html="hit._highlightResult.title.value"></div>
+        <div ng-bind-html="hit._highlightResult.release_date.value"></div>
+        <div ng-bind-html="hit._highlightResult.release_year.value"></div>
+        <div ng-bind-html="hit._highlightResult.rating.value"></div>
+      </div>
+      <div class="col-sm-4">
+         <address>
+          <span ng-bind-html="hit._highlightResult.title.value"></span><br>
+          <span ng-bind-html="hit._highlightResult.rating.value"></span><br>
+          <span 
+          ng-bind-html="hit._highlightResult.release_date.value + ' ' + hit._highlightResult.release_year.value + ' ' + hit._highlightResult.imdb.value">
+        </span><br>
+          <abbr title="title">P:</abbr><span ng-bind-html="hit._highlightResult.title.value"></span>
+        </address>
+      </div>
+    </div>
+  </div>
+  <p ng-show="!hits.length" class="text-center">No results are matching your query.</p>
+</div>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p>Welcome to <%= title %></p>
+<input class="typeahead" type="text" placeholder="Search for users by name, company, ..." id="user-search" spellcheck="false" />
+
+<script src="/javascripts/jquery.min.js"></script>
+<script src="/javascripts/typeahead.jquery.min.js"></script>
+<script src="/javascripts/algoliasearch.min.js"></script>
+<script src="/javascripts/firebase.js"></script>
+
+<script type="text/javascript">
+
+
+
+  $(document).ready(function() {
+
+
+  var fb = new Firebase('https://blistering-heat-3299.firebaseio.com/results');
+  //var algolia = algoliasearch('GSLW7H4FX6', '6d38326fdc63c2715698c888b55eb2d2');
+	var client = algoliasearch('GSLW7H4FX6', '6d38326fdc63c2715698c888b55eb2d2');
+  //var index_algolia = algolia.initIndex('colorsArray');
+ 
+ //var fb = new Firebase("https://brilliant-torch-9921.firebaseio.com/?page=Auth");
+  
+  var index = client.initIndex('colorsArray');
+
+
+
+
+// Get all data from Firebase
+fb.on('value', initIndex);
+
+function initIndex(dataSnapshot) {
+ 
+  // Array of data to index
+  var objectsToIndex = [];
+
+  // Get all objects
+  var values = dataSnapshot.val();
+
+  // Process each Firebase ojbect
+  for (var key in values) {
+    if (values.hasOwnProperty(key)) {
+      // Get current Firebase object
+      var firebaseObject = values[key];
+
+      // Specify Algolia's objectID using the Firebase object key
+      firebaseObject.objectID = key;
+
+      // Add object for indexing
+      objectsToIndex.push(firebaseObject);
+    }
+  }
+
+  // Add or update new objects
+  index.saveObjects(objectsToIndex, function(err, content) {
+    if (err) {
+     throw err;
+    }
+    console.log(objectsToIndex);
+ 
+    console.log('Firebase<>Algolia import done');
+  });
+}
+    $('#user-search').typeahead({hint: false}, {
+	
+       source: index.ttAdapter({hitsPerPage: 5}),
+      displayKey: 'colorName',
+      templates: {
+        suggestion: function(hit) {
+          // render the hit
+          return '<div class="hit">' +
+            '<div class="name">' +
+              hit._highlightResult.colorName.value + ' ' +
+              '(' + hit._highlightResult.hexValue.value + ')' +
+            '</div>' +
+          '</div>';
+        }
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
